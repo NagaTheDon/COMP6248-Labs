@@ -14,7 +14,7 @@ probabilities = hypothesis/sum_hyp
 print("=============")
 print(probabilities)
 
-cost_examples    = np.multiply(y, np.log(probabilities))
+cost_examples = np.multiply(y, np.log(probabilities))
 print("===============")
 print(cost_examples)
 
@@ -24,4 +24,4 @@ print(total_sum)
 
 print(total_sum - 0.6265)
 
-assert (total_sum - 0.6265) < 0.0001s
+assert (total_sum - 0.6265) < 0.0001
