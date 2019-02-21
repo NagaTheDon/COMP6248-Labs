@@ -17,19 +17,15 @@ def softmax_regression_loss_grad(Theta, X, y):
         one_shot[y[i,0],i] = 1
 
     X_Theta = torch.mm(X,Theta)
-    print("X-Theta --> 100,10 ", X_Theta.shape)
+    
     exp_term = torch.exp(X_Theta)
     frac_term = exp_term/torch.sum(exp_term,(0))
 
     difference = (one_shot.double() - frac_term.t())
-    print("difference --> 10, 100", difference.shape)
 
     theta_grad = torch.mm(difference, X)
-    print("theta_grad --> 10x20", theta_grad.shape)
 
-    grad = -(theta_grad.flatten())
-    print("grad shape: ", grad.shape)
-    print(grad)
+    grad = -(theta_grad).t()
     return grad
 
 
@@ -54,8 +50,6 @@ def softmax_regression_loss(Theta, X, y):
     # NOTE: The sum is added along the column since the sigma is across the classes
 
     frac_term = exp_term/exp_sum 
-    print("frac_term shape: ", frac_term.shape)
-    print("one_shot shape: ", one_shot.shape)
 
     cost_matrix = one_shot.double().t()*torch.log(frac_term).double()
     #NOTE: WE WANT MULTIPLY not dot or mm. We want the diagnols to be zeros
@@ -68,6 +62,8 @@ def softmax_regression_loss(Theta, X, y):
 
 def grad_check(f, x, analytic_grad, num_checks=10, h=1e-3):
     sum_error = 0
+
+    print("x shape: ", x.shape)
     for i in range(num_checks):
         ix = tuple([randrange(m) for m in x.shape]) #randomly sample value to change
 
@@ -95,7 +91,7 @@ y = torch.torch.randint(0, num_classes, (num_items, 1))
 
 # compute the analytic gradient
 grad = softmax_regression_loss_grad(Theta, X, y)
-    
+
 # run the gradient checker    
 grad_check(lambda th: softmax_regression_loss(th, X, y), Theta, grad)
 
