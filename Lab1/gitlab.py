@@ -1,30 +1,3 @@
-# This piece of software is bound by The MIT License (MIT)
-# Copyright (c) 2014 Siddharth Agrawal
-# Code written by : Siddharth Agrawal
-# Email ID : siddharth.950@gmail.com
-
-import struct
-import numpy
-import array
-import time
-import scipy.sparse
-import scipy.optimize
-
-################################################################################                                                                                                                                  ###########
-""" The Softmax Regression class """
-
-class SoftmaxRegression(object):
-
-    ############################################################################                                                                                                                                  ###########
-    """ Initialization of Regressor object """
-
-    def __init__(self, input_size, num_classes, lamda):
-:...skipping...
-# This piece of software is bound by The MIT License (MIT)
-# Copyright (c) 2014 Siddharth Agrawal
-# Code written by : Siddharth Agrawal
-# Email ID : siddharth.950@gmail.com
-
 import struct
 import numpy
 import array
@@ -85,6 +58,8 @@ class SoftmaxRegression(object):
 
         theta = theta.reshape(self.num_classes, self.input_size)
 
+        # print("theta after reshape: ", theta.shape)
+
         """ Compute the class probabilities for each example """
 
         theta_x       = numpy.dot(theta, input)
@@ -108,9 +83,14 @@ class SoftmaxRegression(object):
         """ Compute and unroll 'theta' gradient """
 
         theta_grad = -numpy.dot(ground_truth - probabilities, numpy.transpose(input))
-        theta_grad = theta_grad / input.shape[1] + self.lamda * theta
+        # print("probabilities shape: ", probabilities.shape)
+        # print("Theta_grad shape: ", theta_grad.shape)
+        # print("ground_truth shape: ", ground_truth.shape)
+        # print("input:", input.shape)
+        theta_grad = theta_grad / input.shape[1]
         theta_grad = numpy.array(theta_grad)
         theta_grad = theta_grad.flatten()
+        print("theta_grad:",theta_grad.shape)
 
         return [cost, theta_grad]
 
@@ -229,10 +209,13 @@ def executeSoftmaxRegression():
 
     training_data   = loadMNISTImages('train-images.idx3-ubyte')
     training_labels = loadMNISTLabels('train-labels.idx1-ubyte')
+    print("training_data shape: ", training_data.shape)
+    print("training_labels shape: ", training_labels.shape)
 
     """ Initialize Softmax Regressor with the above parameters """
 
     regressor = SoftmaxRegression(input_size, num_classes, lamda)
+
 
     """ Run the L-BFGS algorithm to get the optimal parameter values """
 
@@ -241,21 +224,24 @@ def executeSoftmaxRegression():
                                             jac = True, options = {'maxiter': max_iterations})
     opt_theta     = opt_solution.x
 
+    regressor.softmaxCost(opt_theta, training_data, training_labels)
+
     """ Load MNIST test images and labels """
 
-    test_data   = loadMNISTImages('t10k-images.idx3-ubyte')
-    test_labels = loadMNISTLabels('t10k-labels.idx1-ubyte')
+  #   test_data   = loadMNISTImages('t10k-images.idx3-ubyte')
+  #   test_labels = loadMNISTLabels('t10k-labels.idx1-ubyte')
+    
 
-    """ Obtain predictions from the trained model """
+  #   """ Obtain predictions from the trained model """
 
-    predictions = regressor.softmaxPredict(opt_theta, test_data)
+  # #  predictions = regressor.softmaxPredict(opt_theta, test_data)
 
-    """ Print accuracy of the trained model """
+  #   """ Print accuracy of the trained model """
 
-    correct = test_labels[:, 0] == predictions[:, 0]
-    print """Accuracy :""", numpy.mean(correct)
+  #   correct = test_labels[:, 0] == predictions[:, 0]
+  #   print ("Accuracy :", numpy.mean(correct))
 
 
-Theta = torch.Tensor([[1, 0], [0, 1]])
-X = torch.Tensor([[1, 0], [0, 1]])
-y = torch.LongTensor([[0], [1]])
+
+
+executeSoftmaxRegression()
