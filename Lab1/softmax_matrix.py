@@ -21,9 +21,13 @@ def softmax_regression_loss(Theta, X, y):
 
     #One-shot encoding
     
-    y = torch.tensor([[1,0],[0,1]])
+    num_examples = y.shape[0]
+    num_classes = y.max() + 1
 
-
+    one_shot = torch.zeros((num_classes, num_examples))
+    
+    for i in range(num_examples):
+        one_shot[y[i,0],i] = 1
 
     theta_x = torch.mm(X, Theta)
     exp_term = torch.exp(theta_x) # Numerator
@@ -32,7 +36,7 @@ def softmax_regression_loss(Theta, X, y):
 
     frac_term = exp_term/exp_sum 
 
-    cost_matrix = y.double()*torch.log(frac_term).double()
+    cost_matrix = one_shot.double()*torch.log(frac_term).double()
     #NOTE: WE WANT MULTIPLY not dot or mm. We want the diagnols to be zeros
 
     loss = -(torch.sum(cost_matrix))
