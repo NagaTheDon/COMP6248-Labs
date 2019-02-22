@@ -3,7 +3,10 @@ import numpy
 import array
 import time
 import scipy.sparse
+import torch
+from sklearn.datasets import load_digits
 import scipy.optimize
+
 
 ###########################################################################################
 """ The Softmax Regression class """
@@ -89,8 +92,8 @@ class SoftmaxRegression(object):
         # print("input:", input.shape)
         theta_grad = theta_grad / input.shape[1]
         theta_grad = numpy.array(theta_grad)
+        #print("theta_grad:",theta_grad.shape)
         theta_grad = theta_grad.flatten()
-        print("theta_grad:",theta_grad.shape)
 
         return [cost, theta_grad]
 
@@ -223,8 +226,10 @@ def executeSoftmaxRegression():
                                             args = (training_data, training_labels,), method = 'L-BFGS-B',
                                             jac = True, options = {'maxiter': max_iterations})
     opt_theta     = opt_solution.x
+    print("opt_theta: ", opt_theta)
+    print("opt_theta shape: ", opt_theta.shape)
 
-    regressor.softmaxCost(opt_theta, training_data, training_labels)
+    #regressor.softmaxCost(opt_theta, training_data, training_labels)
 
     """ Load MNIST test images and labels """
 
@@ -241,7 +246,39 @@ def executeSoftmaxRegression():
   #   correct = test_labels[:, 0] == predictions[:, 0]
   #   print ("Accuracy :", numpy.mean(correct))
 
+def HousePrices():
+    X, y = (torch.Tensor(z) for z in load_digits(10, True)) #convert to pytorch Tensors
+    X = torch.cat((X, torch.ones((X.shape[0], 1))), 1) # append a column of 1's to the X's
+    X /= 255
+    y = y.reshape(-1, 1) # reshape y into a column vector
+    y = y.type(torch.LongTensor)
 
+    num_classes = y.max() + 1
 
+    perm = torch.randperm(y.shape[0])
+    X_train = X[perm[0:260], :]
+    y_train = y[perm[0:260]]
+    X_test = X[perm[260:], :]
+    y_test = y[perm[260:]]
 
-executeSoftmaxRegression()
+    X_train = X_train.t()
+
+    print("X_train, X_test shape: ", X_train.shape, X_test.shape)
+    print("y_train, y_test shape: ", y_train.shape, y_test.shape)
+
+    alpha = 0.1
+    max_iterations = 1000
+
+    regressor = SoftmaxRegression(65, num_classes, alpha)
+
+    opt_solution  = scipy.optimize.minimize(regressor.softmaxCost, regressor.theta,
+                                            args = (X_train, y_train,), method = 'L-BFGS-B',
+                                            jac = True, options = {'maxiter': max_iterations})
+    opt_theta     = opt_solution.x
+    theta_gd = torch.reshape(torch.Tensor(opt_theta),(65,10))
+    print("theta_gd shape: ", theta_gd.shape)
+
+    proba = torch.softmax(X_test @ theta_gd, 1)
+    print(float((proba.argmax(1)-y_test[:,0]==0).sum()) / float(proba.shape[0]))
+#executeSoftmaxRegression()
+HousePrices()

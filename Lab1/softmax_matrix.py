@@ -17,7 +17,7 @@ def softmax_regression_loss_grad(Theta, X, y):
         one_shot[y[i,0],i] = 1
 
     X_Theta = torch.mm(X,Theta)
-    
+
     exp_term = torch.exp(X_Theta)
     frac_term = exp_term/torch.sum(exp_term,(0))
 
@@ -25,7 +25,7 @@ def softmax_regression_loss_grad(Theta, X, y):
 
     theta_grad = torch.mm(difference, X)
 
-    grad = -(theta_grad).t()
+    grad = -(theta_grad.t())
     return grad
 
 
@@ -63,7 +63,6 @@ def softmax_regression_loss(Theta, X, y):
 def grad_check(f, x, analytic_grad, num_checks=10, h=1e-3):
     sum_error = 0
 
-    print("x shape: ", x.shape)
     for i in range(num_checks):
         ix = tuple([randrange(m) for m in x.shape]) #randomly sample value to change
 
@@ -105,3 +104,28 @@ assert torch.abs(softmax_regression_loss(Theta, X, y) - 0.6265) < 0.0001
 
 grad = softmax_regression_loss_grad(Theta, X, y)
 assert torch.torch.allclose(torch.abs(grad/0.2689), torch.ones_like(grad), atol=0.001)
+
+X, y = (torch.Tensor(z) for z in load_digits(10, True)) #convert to pytorch Tensors
+X = torch.cat((X, torch.ones((X.shape[0], 1))), 1) # append a column of 1's to the X's
+X /= 255
+y = y.reshape(-1, 1) # reshape y into a column vector
+y = y.type(torch.LongTensor)
+
+perm = torch.randperm(y.shape[0])
+X_train = X[perm[0:260], :]
+y_train = y[perm[0:260]]
+X_test = X[perm[260:], :]
+y_test = y[perm[260:]]
+
+alpha = 0.1
+theta_gd = torch.rand((X_train.shape[1], 10))
+
+for e in range(0, 1000):
+    gr = softmax_regression_loss_grad(theta_gd, X_train, y_train)
+    theta_gd -= alpha * gr
+    if e%100 == 0:
+        print("Training Loss: ", softmax_regression_loss(theta_gd, X_train, y_train))
+
+# Compute the accuracy of the test set
+proba = torch.softmax(X_test @ theta_gd, 1)
+print(float((proba.argmax(1)-y_test[:,0]==0).sum()) / float(proba.shape[0]))
