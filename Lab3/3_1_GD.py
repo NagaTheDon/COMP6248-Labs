@@ -12,8 +12,8 @@ X[:, 1] = 1.0
 y = torch.mm(X, theta_true) + 0.3 * torch.randn(M, 1)
 # print (y)
 
-## visualise the data by plotting it
-# YOUR CODE HERE
+# ## visualise the data by plotting it
+# # YOUR CODE HERE
 print (theta_true.shape)
 # print (X)
 print (X.shape)
@@ -150,7 +150,32 @@ plt.scatter(theta_4_r.numpy(), J_t[:,4].numpy(),c='m')
 
 
 # add the plot axes labels and title
+axes = plt.gca()
+
 plt.xlabel(r'$\theta_1$')
 plt.ylabel(r'$J(\theta_1)$')
 plt.title('Cost function')
+plt.show()
+
+theta_0_vals = np.linspace(-1.0,1,100)
+print(theta_0_vals[0])
+theta_1_vals = np.linspace(-4.0,4,100)
+
+J = torch.zeros(100,100)
+
+for zero_ind in range(100):
+    for first_ind in range(100):
+        #print(zero_ind, first_ind)
+        single_theta = torch.Tensor([[theta_0_vals[zero_ind]],
+                               [theta_1_vals[first_ind]]])
+        # print(single_theta.shape)
+        J[zero_ind,first_ind] = torch.sum(cost_func(single_theta, X, y))# Might need to change this... 
+print(J.shape)
+
+xc,yc = np.meshgrid(theta_0_vals, theta_1_vals)
+contours = plt.contour(xc, yc, J, 20)
+axes = plt.gca()
+axes.set_xlim([-1,1])
+axes.set_ylim([-5,5])
+plt.clabel(contours)
 plt.show()
