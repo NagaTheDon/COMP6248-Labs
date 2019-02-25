@@ -114,3 +114,33 @@ plt.show()
 plt.xlabel(r'$x$')
 plt.ylabel(r'$y$')
 plt.title('Data and fit')
+
+# Need to fix the problem here 
+theta_0 = theta[:,:,0]
+print (theta_0.shape)
+theta_0_r = theta_0[1,:]
+# print (theta_0_r)
+theta_1 = theta[:,:,1]
+theta_1_r = theta_1[1,:]
+theta_2 = theta[:,:,2]
+theta_2_r = theta_1[1,:]
+theta_3 = theta[:,:,3]
+theta_3_r = theta_1[1,:]
+theta_4 = theta[:,:,4]
+theta_4_r = theta_1[1,:]
+print("'#''''''''")
+print (theta_1_r)
+print (J_t[:,1])
+plt.scatter(theta_0_r.numpy(), J_t[:,0].numpy(),c='c')
+plt.scatter(theta_1_r.numpy(), J_t[:,1].numpy(),c='b')
+plt.scatter(theta_2_r.numpy(), J_t[:,2].numpy(),c='orange')
+plt.scatter(theta_3_r.numpy(), J_t[:,3].numpy(),c='g')
+plt.scatter(theta_4_r.numpy(), J_t[:,4].numpy(),c='m')
+
+
+
+# add the plot axes labels and title
+plt.xlabel(r'$\theta_1$')
+plt.ylabel(r'$J(\theta_1)$')
+plt.title('Cost function')
+plt.show()
