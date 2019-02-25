@@ -117,20 +117,30 @@ plt.title('Data and fit')
 
 # Need to fix the problem here 
 theta_0 = theta[:,:,0]
-print (theta_0.shape)
-theta_0_r = theta_0[1,:]
+theta_0_r = theta_0[0,:]
 # print (theta_0_r)
+print("!!!!!!!!!!!!!!!!!!")
 theta_1 = theta[:,:,1]
-theta_1_r = theta_1[1,:]
+theta_1_r = theta_1[0,:]
 theta_2 = theta[:,:,2]
-theta_2_r = theta_1[1,:]
+theta_2_r = theta_2[0,:]
 theta_3 = theta[:,:,3]
-theta_3_r = theta_1[1,:]
+theta_3_r = theta_3[0,:]
 theta_4 = theta[:,:,4]
-theta_4_r = theta_1[1,:]
+theta_4_r = theta_4[0,:]
+
 print("'#''''''''")
-print (theta_1_r)
-print (J_t[:,1])
+
+print(theta_0_r,theta_2_r, theta_3_r, theta_4_r)
+
+print("'#''''''''")
+# print (theta_1_r)
+print (J_t[:,0])
+print(J_t[:,1])
+print(J_t[:,2])
+print(J_t[:,3])
+print(J_t[:,4])
+
 plt.scatter(theta_0_r.numpy(), J_t[:,0].numpy(),c='c')
 plt.scatter(theta_1_r.numpy(), J_t[:,1].numpy(),c='b')
 plt.scatter(theta_2_r.numpy(), J_t[:,2].numpy(),c='orange')
