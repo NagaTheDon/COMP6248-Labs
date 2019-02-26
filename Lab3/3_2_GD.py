@@ -48,7 +48,8 @@ def weightupdate_adam(count, X, y):
     S_dw_corr = S_dw_lo/(1 - (beta_2**count))
     theta = theta_0 - alpha*(V_dw_corr/torch.sqrt(torch.Tensor(S_dw_corr)))
 
-    print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
+    if(count%10 == 0):
+    	print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
     return V_dw_lo, S_dw_lo, theta
 
 
@@ -59,13 +60,19 @@ def weightupdate_sgd_momentum(count, X, y):
 	V_t_lo = (beta_1*V_t) + (1 - beta_1)*der_w
 
 	theta = theta_0 - (alpha*V_t_lo) # This is basically w
-	print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
+	if(count%10 == 0):
+		print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
 	return V_t_lo, theta
 
 
 ## The weight updated computed using SGD
 def weigthupdate_sgd(count, X, y):
-	
+	der_w = grad_cost_func(theta_0, X, y)
+	theta = theta_0 - (alpha*der_w)
+	if(count%10 == 0):
+		print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
+	return theta
+
 
 N = 200
 beta_1 = 0.9
@@ -92,7 +99,11 @@ theta_0 = torch.Tensor([[2],[4]])
 for i in range(1,N):
 	V_t, theta_0 =  weightupdate_sgd_momentum(i, X, y)
 
+#weightupdate_sgd
+theta_0 = torch.Tensor([[2],[4]])
 
+for i in range(1,N):
+	theta_0 =  weigthupdate_sgd(i, X, y)
 
 # raise NotImplementedError()
 
