@@ -32,8 +32,7 @@ def hypothesis(theta, X):
 ## grad_cost_func computes the gradient of J for linear regression given J is the MSE 
 def grad_cost_func(theta, X, y): 
     # YOUR CODE HERE
-    X_t = X.t()
-    sum_term = X.t()@(hypothesis(theta, X) - y)
+    sum_term = (X.t()@(hypothesis(theta, X) - y)).sum(0)
     grad = (1/M)*sum_term
     return grad
     # raise NotImplementedError()
@@ -41,7 +40,7 @@ def grad_cost_func(theta, X, y):
 ## cost_func computes the cost function J
 def cost_func(theta, X, y):
     # YOUR CODE HERE
-    sum_term = (hypothesis(theta, X) - y)**2
+    sum_term = ((hypothesis(theta, X) - y)**2).sum(0)
     cost = (1/(2*M))*sum_term
     return cost
     # raise NotImplementedError()
@@ -158,7 +157,6 @@ plt.title('Cost function')
 plt.show()
 
 theta_0_vals = np.linspace(-1.0,1,100)
-print(theta_0_vals[0])
 theta_1_vals = np.linspace(-4.0,4,100)
 
 J = torch.zeros(100,100)
@@ -169,8 +167,8 @@ for zero_ind in range(100):
         single_theta = torch.Tensor([[theta_0_vals[zero_ind]],
                                [theta_1_vals[first_ind]]])
         # print(single_theta.shape)
-        J[zero_ind,first_ind] = torch.sum(cost_func(single_theta, X, y))# Might need to change this... 
-print(J.shape)
+
+        J[first_ind,zero_ind] = cost_func(single_theta, X, y)# Might need to change this... 
 
 xc,yc = np.meshgrid(theta_0_vals, theta_1_vals)
 contours = plt.contour(xc, yc, J, 20)
