@@ -11,50 +11,55 @@ def softmax_regression_loss_grad(Theta, X, y):
     num_examples = y.shape[0]
     num_classes = y.max() + 1
 
-    one_shot = torch.zeros((num_classes, num_examples))
+    one_shot = torch.zeros((num_examples, num_classes))
 
     for i in range(num_examples):
-        one_shot[y[i,0],i] = 1
+        one_shot[i,y[i,0]] = 1
 
     X_Theta = torch.mm(X,Theta)
 
     exp_term = torch.exp(X_Theta)
-    frac_term = exp_term/torch.sum(exp_term,(0))
 
-    difference = (one_shot.double() - frac_term.t())
+    frac_term = exp_term/(torch.sum(exp_term,(1))).reshape((num_examples,1))
 
-    theta_grad = torch.mm(difference, X)
+    difference = (one_shot.double() - frac_term)
 
-    grad = -(theta_grad).t()
+    theta_grad = torch.mm(X.t(), difference)
+
+    grad = -(theta_grad)
     return grad
-
-
-
-
-
 def softmax_regression_loss(Theta, X, y):
 
-    #One-shot encoding
+    #One-hot encoding
+    # print(y)
     
     num_examples = y.shape[0]
     num_classes = y.max() + 1
 
-    one_shot = torch.zeros((num_classes, num_examples))
+    one_shot = torch.zeros((num_examples,num_classes))
 
     for i in range(num_examples):
-        one_shot[y[i,0],i] = 1
+        one_shot[i,y[i,0]] = 1
 
     theta_x = torch.mm(X, Theta)
     exp_term = torch.exp(theta_x) # Numerator
-    exp_sum = torch.sum(exp_term, (0)) # Denominator 
+    exp_sum = torch.sum(exp_term, (1)) # Denominator 
     # NOTE: The sum is added along the column since the sigma is across the classes
 
-    frac_term = exp_term/exp_sum 
+    frac_term = exp_term/((exp_sum).reshape((num_examples,1)))
 
-    cost_matrix = one_shot.double().t()*torch.log(frac_term).double()
+    # cost_matrix = torch.dot(one_shot.double(),torch.log(frac_term).double())
+
+    # cost_matrix = torch.zeros((100,1))
+
+    # loss = -(torch.sum(cost_matrix))
+    loss = 0
+    for i in range(num_examples):
+        loss -= torch.dot(one_shot[i,:], torch.log(frac_term[i,:]))
+
     #NOTE: WE WANT MULTIPLY not dot or mm. We want the diagnols to be zeros
 
-    loss = -(torch.sum(cost_matrix))
+    
 
 
 
@@ -89,26 +94,8 @@ def softmax_regression_loss_grad_0(Theta, X, y):
     X contains the data vectors (one vector per row)
     y is a column vector of the targets
     '''
-    num_examples = y.shape[0]
-    num_classes = y.max() + 1 #
-
-    one_shot = torch.zeros((num_classes, num_examples))
-
-    for i in range(num_examples):
-        one_shot[y[i,0],i] = 1
-
-    # add the missing column of zeros:
     Theta = torch.cat((Theta, torch.zeros(Theta.shape[0],1)), 1)
-
-    X_Theta = torch.mm(X,Theta)
-
-    exp_term = torch.exp(X_Theta)
-    frac_term = exp_term/torch.sum(exp_term,(0))
-    difference = (one_shot.double() - frac_term.t())
-
-    theta_grad = torch.mm(difference, X)
-
-    grad = -(theta_grad).t()
+    grad = softmax_regression_loss_grad(Theta,X,y)
     
     # remove the last column from the gradients
     grad = grad[0:grad.shape[0], 0:grad.shape[1]-1]
@@ -160,7 +147,7 @@ for e in range(0, 1000):
     if e%100 == 0:
         print("Training Loss: ", softmax_regression_loss(theta_gd, X_train, y_train))
 
-#Compute the accuracy of the test set
+# Compute the accuracy of the test set
 proba = torch.softmax(X_test @ theta_gd, 1)
 print(float((proba.argmax(1)-y_test[:,0]==0).sum()) / float(proba.shape[0]))
 
@@ -170,6 +157,7 @@ y = torch.LongTensor([[0], [1]])
 
 grad = softmax_regression_loss_grad(Theta, X, y)
 grad0 = softmax_regression_loss_grad_0(Theta[:,0:grad.shape[1]-1], X, y)
+print(grad[:,0:grad.shape[1]-1], grad0)
 
 assert torch.torch.allclose(grad[:,0:grad.shape[1]-1], grad0)
 
