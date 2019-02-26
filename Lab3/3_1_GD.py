@@ -32,7 +32,7 @@ def hypothesis(theta, X):
 ## grad_cost_func computes the gradient of J for linear regression given J is the MSE 
 def grad_cost_func(theta, X, y): 
     # YOUR CODE HERE
-    sum_term = (X.t()@(hypothesis(theta, X) - y)).sum(0)
+    sum_term = (X.t()@(hypothesis(theta, X) - y))
     grad = (1/M)*sum_term
     return grad
     # raise NotImplementedError()
@@ -56,7 +56,7 @@ theta_grid[:,1] = 2.0
 # print (y.shape)
 
 J_grid = cost_func(theta_grid.t(), X, y)
-print (J_grid.shape)
+
 
 N = 5
 eta = 0.03
@@ -83,7 +83,7 @@ for j in range(1,N):
 colors = ['b', 'g', 'm', 'c', 'orange']
 
 ## Plot the data 
-# YOUR CODE HERE
+
 plt.scatter(X[:,0].numpy(), y.numpy())
 print (theta[:,:,1].shape)
 print (X.shape)
@@ -139,7 +139,11 @@ print(J_t[:,1])
 print(J_t[:,2])
 print(J_t[:,3])
 print(J_t[:,4])
+print(J_grid.shape)
+print(theta_grid[:,0].shape)
 
+
+plt.plot(theta_grid[:,0].numpy(), J_grid.numpy(), c='black')
 plt.scatter(theta_0_r.numpy(), J_t[:,0].numpy(),c='c')
 plt.scatter(theta_1_r.numpy(), J_t[:,1].numpy(),c='b')
 plt.scatter(theta_2_r.numpy(), J_t[:,2].numpy(),c='orange')
