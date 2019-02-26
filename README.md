@@ -1,13 +1,13 @@
-#Deep Learning#
+#Deep Learning
 
-##Lab 1##
+##Lab 1
 
 This is an introduction on PyTorch
 
-##Lab 2##
+##Lab 2
 
 This lab is about different differentiation methods 
 
-##Lab 3##
+##Lab 3
 
-This lab is about ...
+This lab is about Optimisation
