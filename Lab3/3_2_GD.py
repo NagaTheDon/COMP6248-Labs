@@ -24,7 +24,7 @@ def hypothesis(theta, X):
 def grad_cost_func(theta, X, y): 
 
     hyp = hypothesis(theta, X)
-    sum_term = X.t()@(hyp- y)
+    sum_term = (X.t()@(hypothesis(theta, X) - y)).sum(0)
     grad = (1/M)*sum_term
     return grad
     # raise NotImplementedError()
@@ -32,14 +32,14 @@ def grad_cost_func(theta, X, y):
 ## cost_func computes
 def cost_func(theta, X, y):
     # YOUR CODE HERE
-    sum_term = (hypothesis(theta, X) - y)**2
+    sum_term = ((hypothesis(theta, X) - y)**2).sum(0)
     cost = (1/(2*M))*sum_term
     return cost
     # raise NotImplementedError()
 
 ## The weight update computed using the ADAM optimisation algorithm
 def weightupdate_adam(count, X, y):
-
+	#lo means local variable in this function
     der_w = grad_cost_func(theta_0, X, y)
     V_dw_lo = beta_1*V_dw + (1 - beta_1)*der_w
     V_dw_corr = V_dw_lo/(1 - (beta_1**count))
@@ -48,16 +48,24 @@ def weightupdate_adam(count, X, y):
     S_dw_corr = S_dw_lo/(1 - (beta_2**count))
     theta = theta_0 - alpha*(V_dw_corr/torch.sqrt(torch.Tensor(S_dw_corr)))
 
-    print("Cost function at count ", count, " is " ,torch.sum(cost_func(theta, X,y)))
+    print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
     return V_dw_lo, S_dw_lo, theta
 
 
 ## The weight update computed using SGD + momentum
-# def weightupdate_sgd_momentum(count, X, y):
+def weightupdate_sgd_momentum(count, X, y):
+	#lo refers to local 
+	der_w = grad_cost_func(theta_0, X, y)
+	V_t_lo = (beta_1*V_t) + (1 - beta_1)*der_w
+
+	theta = theta_0 - (alpha*V_t_lo) # This is basically w
+	print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
+	return V_t_lo, theta
 
 
 ## The weight updated computed using SGD
-# def weigthupdate_sgd(count, X, y):
+def weigthupdate_sgd(count, X, y):
+	
 
 N = 200
 beta_1 = 0.9
@@ -71,8 +79,20 @@ theta_0 = torch.Tensor([[2],[4]]) #initialise
 V_dw = 0
 S_dw = 0
 
+
+# Need to ask people in lab: for 200 iterations -> N+1 isn't it?
+#Adam
 for i in range(1,N):
     V_dw, S_dw, theta_0 = weightupdate_adam(i, X, y)
+
+#weightupdate_sgd_momentum
+V_t = 0
+theta_0 = torch.Tensor([[2],[4]])
+
+for i in range(1,N):
+	V_t, theta_0 =  weightupdate_sgd_momentum(i, X, y)
+
+
 
 # raise NotImplementedError()
 
