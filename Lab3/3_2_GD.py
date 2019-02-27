@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-## generate M data points roughly forming a line (noise added)
+# generate M data points roughly forming a line (noise added)
 M = 50
 theta_true = torch.Tensor([[0.5], [2]])
-# print (theta_true)
+
 
 X = 10 * torch.rand(M, 2) - 5
 X[:, 1] = 1.0
@@ -16,27 +16,26 @@ y = torch.mm(X, theta_true) + 0.3 * torch.randn(M, 1)
 
 ## hypothesis computes $h_theta$
 def hypothesis(theta, X):
-    # YOUR CODE HERE
     h_theta = torch.mm(X, theta)
     return h_theta
-    # raise NotImplementedError()
 
-## grad_cost_func computes the gradient of J for linear regression given J is the MSE 
+
+# grad_cost_func computes the gradient of J for linear regression given J is the MSE 
 def grad_cost_func(theta, X, y): 
 
     hyp = hypothesis(theta, X)
     sum_term = (X.t()@(hypothesis(theta, X) - y))
     grad = (1/M)*sum_term
     return grad
-    # raise NotImplementedError()
+
     
-## cost_func computes
+
 def cost_func(theta, X, y):
-    # YOUR CODE HERE
+
     sum_term = ((hypothesis(theta, X) - y)**2).sum(0)
     cost = (1/(2*M))*sum_term
     return cost
-    # raise NotImplementedError()
+
 
 ## The weight update computed using the ADAM optimisation algorithm
 def weightupdate_adam(count, X, y):
@@ -49,30 +48,23 @@ def weightupdate_adam(count, X, y):
     S_dw_corr = S_dw_lo/(1 - (beta_2**count))
     theta = theta_0 - alpha*(V_dw_corr/torch.sqrt(torch.Tensor(S_dw_corr)))
 
-    # if(count%10 == 0):
-    # 	print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
     return V_dw_lo, S_dw_lo, theta
 
 
 ## The weight update computed using SGD + momentum
-
 def weightupdate_sgd_momentum(count, X, y):
 	#lo refers to local 
-	der_w = grad_cost_func(theta_0, X, y)
+	der_w = grad_cost_func(theta_1, X, y)
 	V_t_lo = (beta_1*V_t) + (1 - beta_1)*der_w
 
-	theta = theta_1 - (alpha*V_t_lo) # This is basically w
-	# if(count%10 == 0):
-	# 	print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
+	theta = theta_1 - (alpha*V_t_lo) # This is basically weights
 	return V_t_lo, theta
 
 
 ## The weight updated computed using SGD
 def weigthupdate_sgd(count, X, y):
-	der_w = grad_cost_func(theta_0, X, y)
+	der_w = grad_cost_func(theta_2, X, y)
 	theta = theta_2 - (alpha*der_w)
-	# if(count%10 == 0):
-	# 	print("Cost function at count ", count, " is " ,cost_func(theta, X,y))
 	return theta
 
 
@@ -91,8 +83,8 @@ theta_ADAM = torch.zeros((2,1,N))
 
 V_dw = 0
 S_dw = 0
-
 theta_0 = torch.Tensor([[2],[4]]) #initialise
+
 theta_ADAM[:,:,0] = theta_0
 
 for i in range(1,N):
@@ -105,18 +97,26 @@ for i in range(1,N):
 	theta_ADAM[:,:,i] = theta_0
     
 
-# #weightupdate_sgd_momentum
-# theta_1 = torch.Tensor([[2],[4]])
-# V_t = 0
-# for i in range(1,N):
-# 	V_t, theta_1 =  weightupdate_sgd_momentum(i, X, y)
+# weightupdate_sgd_momentum
+theta_sgd_m = torch.zeros((2,1,N))
 
-# #weightupdate_sgd
-# theta_2 = torch.Tensor([[2],[4]])
-# for i in range(1,N):
-# 	theta_2 =  weigthupdate_sgd(i, X, y)
+V_t = 0
+theta_1 = torch.Tensor([[2],[4]])
 
-# print(theta_0, theta_1, theta_2)
+theta_sgd_m[:,:,0] = theta_1
+
+for i in range(1,N):
+	perm = torch.randperm(M)
+	for batch_num in range(int(M/batch_size)):
+		X_batch = X[perm[batch_num*10:(batch_num+1)*10], :]
+		y_batch = y[perm[batch_num*10:(batch_num+1)*10], :]
+		V_t, theta_1 =  weightupdate_sgd_momentum(i, X_batch, y_batch)
+
+	theta_sgd_m[:,:,i] = theta_1
+
+# weightupdate_sgd
+
+
 
 theta_0_vals = np.linspace(-2,4,100)
 theta_1_vals = np.linspace(0,4,100)
@@ -134,7 +134,7 @@ for zero_ind in range(100):
 xc,yc = np.meshgrid(theta_0_vals, theta_1_vals)
 contours = plt.contour(xc, yc, J, 20)
 adam_point = plt.scatter(theta_ADAM[0,:,:], theta_ADAM[1,:,:], marker='o', s=20, c='red')
-# sgd_m_point = plt.scatter(theta_1[0], theta_1[1], marker='o', s=20, c='cyan')
+sgd_m_point = plt.scatter(theta_sgd_m[0,:,:], theta_sgd_m[1,:,:], marker='o', s=20, c='cyan')
 # sgd = plt.scatter(theta_2[0], theta_2[1], marker='o', s=20, c='green')
 
 # plt.legend((adam_point, sgd_m_point, sgd),
