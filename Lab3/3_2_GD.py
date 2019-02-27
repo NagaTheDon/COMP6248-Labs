@@ -150,9 +150,9 @@ adam_point = plt.scatter(theta_ADAM[0,:,:], theta_ADAM[1,:,:], marker='o', s=20,
 sgd_m_point = plt.scatter(theta_sgd_m[0,:,:], theta_sgd_m[1,:,:], marker='o', s=20, c='cyan')
 sgd = plt.scatter(theta_sgd[0,:,:], theta_sgd[1,:,:], marker='o', s=20, c='green')
 
-# plt.legend((adam_point, sgd_m_point, sgd),
-#            ('ADAM', 'SGD with Momentum', 'SGD'),loc='lower right',
-#             fontsize=8)
+plt.legend((adam_point, sgd_m_point, sgd),
+           ('ADAM', 'SGD with Momentum', 'SGD'),loc='lower right',
+            fontsize=8)
 
 plt.show()
 
