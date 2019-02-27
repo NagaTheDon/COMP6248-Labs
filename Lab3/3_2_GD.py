@@ -10,6 +10,7 @@ theta_true = torch.Tensor([[0.5], [2]])
 
 X = 10 * torch.rand(M, 2) - 5
 X[:, 1] = 1.0
+print("X shape: ", X.shape)
 
 y = torch.mm(X, theta_true) + 0.3 * torch.randn(M, 1)
 
@@ -24,7 +25,7 @@ def hypothesis(theta, X):
 def grad_cost_func(theta, X, y): 
 
     hyp = hypothesis(theta, X)
-    sum_term = (X.t()@(hypothesis(theta, X) - y)).sum(0)
+    sum_term = (X.t()@(hypothesis(theta, X) - y))
     grad = (1/M)*sum_term
     return grad
     # raise NotImplementedError()
@@ -37,8 +38,6 @@ def cost_func(theta, X, y):
     return cost
     # raise NotImplementedError()
 
-V_dw = 0
-S_dw = 0
 ## The weight update computed using the ADAM optimisation algorithm
 def weightupdate_adam(count, X, y):
 	#lo refers to local variable in this function
@@ -77,29 +76,47 @@ def weigthupdate_sgd(count, X, y):
 	return theta
 
 
+
+
+
 N = 200
 beta_1 = 0.9
 beta_2 = 0.999
 alpha = 0.01
+batch_size = 10
 
 # Need to ask people in lab: for 200 iterations -> N+1 isn't it?
 #Adam
+theta_ADAM = torch.zeros((2,1,N))
+
+V_dw = 0
+S_dw = 0
+
 theta_0 = torch.Tensor([[2],[4]]) #initialise
-for i in range(1,N):
-    V_dw, S_dw, theta_0 = weightupdate_adam(i, X, y)
+theta_ADAM[:,:,0] = theta_0
 
-#weightupdate_sgd_momentum
-theta_1 = torch.Tensor([[2],[4]])
-V_t = 0
 for i in range(1,N):
-	V_t, theta_1 =  weightupdate_sgd_momentum(i, X, y)
+	perm = torch.randperm(M)
+	for batch_num in range(int(M/batch_size)):
+		X_batch = X[perm[batch_num*10:(batch_num+1)*10], :]
+		y_batch = y[perm[batch_num*10:(batch_num+1)*10], :]
+		V_dw, S_dw, theta_0 = weightupdate_adam(i, X_batch, y_batch)
 
-#weightupdate_sgd
-theta_2 = torch.Tensor([[2],[4]])
-for i in range(1,N):
-	theta_2 =  weigthupdate_sgd(i, X, y)
+	theta_ADAM[:,:,i] = theta_0
+    
 
-print(theta_0, theta_1, theta_2)
+# #weightupdate_sgd_momentum
+# theta_1 = torch.Tensor([[2],[4]])
+# V_t = 0
+# for i in range(1,N):
+# 	V_t, theta_1 =  weightupdate_sgd_momentum(i, X, y)
+
+# #weightupdate_sgd
+# theta_2 = torch.Tensor([[2],[4]])
+# for i in range(1,N):
+# 	theta_2 =  weigthupdate_sgd(i, X, y)
+
+# print(theta_0, theta_1, theta_2)
 
 theta_0_vals = np.linspace(-2,4,100)
 theta_1_vals = np.linspace(0,4,100)
@@ -116,13 +133,13 @@ for zero_ind in range(100):
 
 xc,yc = np.meshgrid(theta_0_vals, theta_1_vals)
 contours = plt.contour(xc, yc, J, 20)
-adam_point = plt.scatter(theta_0[0], theta_0[1], marker='o', s=20, c='red')
-sgd_m_point = plt.scatter(theta_1[0], theta_1[1], marker='o', s=20, c='cyan')
-sgd = plt.scatter(theta_2[0], theta_2[1], marker='o', s=20, c='green')
+adam_point = plt.scatter(theta_ADAM[0,:,:], theta_ADAM[1,:,:], marker='o', s=20, c='red')
+# sgd_m_point = plt.scatter(theta_1[0], theta_1[1], marker='o', s=20, c='cyan')
+# sgd = plt.scatter(theta_2[0], theta_2[1], marker='o', s=20, c='green')
 
-plt.legend((adam_point, sgd_m_point, sgd),
-           ('ADAM', 'SGD with Momentum', 'SGD'),loc='lower right',
-            fontsize=8)
+# plt.legend((adam_point, sgd_m_point, sgd),
+#            ('ADAM', 'SGD with Momentum', 'SGD'),loc='lower right',
+#             fontsize=8)
 
 plt.show()
 
