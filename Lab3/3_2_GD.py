@@ -115,7 +115,20 @@ for i in range(1,N):
 	theta_sgd_m[:,:,i] = theta_1
 
 # weightupdate_sgd
+theta_sgd = torch.zeros((2,1,N))
 
+theta_2 = torch.Tensor([[2],[4]])
+
+theta_sgd[:,:,0] = theta_2
+
+for i in range(1,N):
+	perm = torch.randperm(M)
+	for batch_num in range(int(M/batch_size)):
+		X_batch = X[perm[batch_num*10:(batch_num+1)*10], :]
+		y_batch = y[perm[batch_num*10:(batch_num+1)*10], :]
+		theta_2 =  weigthupdate_sgd(i, X_batch, y_batch)
+
+	theta_sgd[:,:,i] = theta_2
 
 
 theta_0_vals = np.linspace(-2,4,100)
@@ -135,7 +148,7 @@ xc,yc = np.meshgrid(theta_0_vals, theta_1_vals)
 contours = plt.contour(xc, yc, J, 20)
 adam_point = plt.scatter(theta_ADAM[0,:,:], theta_ADAM[1,:,:], marker='o', s=20, c='red')
 sgd_m_point = plt.scatter(theta_sgd_m[0,:,:], theta_sgd_m[1,:,:], marker='o', s=20, c='cyan')
-# sgd = plt.scatter(theta_2[0], theta_2[1], marker='o', s=20, c='green')
+sgd = plt.scatter(theta_sgd[0,:,:], theta_sgd[1,:,:], marker='o', s=20, c='green')
 
 # plt.legend((adam_point, sgd_m_point, sgd),
 #            ('ADAM', 'SGD with Momentum', 'SGD'),loc='lower right',
