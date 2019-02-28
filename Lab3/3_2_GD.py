@@ -20,7 +20,6 @@ def hypothesis(theta, X):
 
 # grad_cost_func computes the gradient of J for linear regression given J is the MSE 
 def grad_cost_func(theta, X, y): 
-
     hyp = hypothesis(theta, X)
     sum_term = (X.t()@(hypothesis(theta, X) - y))
     grad = (1/M)*sum_term
